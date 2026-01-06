@@ -1,0 +1,16 @@
+{
+  "@@locale": "en",
+  "language": "English",
+  "languageEn": "English",
+  "bottomNavBarTabLabel": "{tab, select, main{Home} menu{Menu} other{Other}}",
+  "@bottomNavBarTabLabel": {
+    "description": "The label for the bottom navigation bar tab.",
+    "placeholders": {
+      "tab": {
+        "type": "String",
+        "example": "home",
+        "description": "The label for the bottom navigation bar tab."
+      }
+    }
+  }
+}
