@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:powersync_attachments_example/src/common/constant/app_spacing.dart';
-import 'package:powersync_attachments_example/src/common/constant/config.dart';
+import 'package:shared/shared.dart';
 
 /// {@template scaffold_padding}
 /// ScaffoldPadding widget.

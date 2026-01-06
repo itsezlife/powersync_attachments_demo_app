@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:octopus/octopus.dart';
+import 'package:powersync_attachments_example/src/auth/auth.dart';
 import 'package:powersync_attachments_example/src/home/view/home_view.dart';
 import 'package:powersync_attachments_example/src/main/view/main_view.dart';
-import 'package:powersync_attachments_example/src/menu/view/menu_view.dart';
+import 'package:powersync_attachments_example/src/posts/create_post/create_post.dart';
+import 'package:powersync_attachments_example/src/user_profile/view/user_page.dart';
 
 enum Routes with OctopusRoute {
   home('home', title: 'Home'),
   main('main', title: 'Main'),
-  menu('menu', title: 'Menu');
+  profile('profile', title: 'Profile'),
+  auth('auth', title: 'Auth'),
+  createPost('createPost', title: 'Create Post');
 
   const Routes(this.name, {this.title});
 
@@ -24,8 +28,16 @@ enum Routes with OctopusRoute {
         return const HomeView();
       case Routes.main:
         return const MainView();
-      case Routes.menu:
-        return const MenuView();
+      case Routes.profile:
+        return const UserProfilePage();
+      case Routes.auth:
+        final showLogin = switch (node.arguments['showLogin']) {
+          final String value => value == 'true',
+          null => true,
+        };
+        return AuthPage(showLogin: showLogin);
+      case Routes.createPost:
+        return const CreatePostView();
     }
   }
 

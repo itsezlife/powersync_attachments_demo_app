@@ -1,0 +1,36 @@
+name: shared
+description: Shares common application models/utilities/configs
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+  flutter: ^3.35.0
+
+dependencies:
+  dio: ^5.9.0
+  env:
+    path: ../env
+  equatable: ^2.0.8
+  flutter:
+    sdk: flutter
+  flutter_image_compress: ^2.4.0
+  freezed_annotation: ^3.1.0
+  http_parser: ^4.1.2
+  image: ^4.7.2
+  image_picker: ^1.2.1
+  json_annotation: ^4.9.0
+  mime: ^2.0.0
+  path: ^1.9.1
+  user_repository:
+    path: ../user_repository
+  uuid: ^4.5.2
+
+dev_dependencies:
+  build_runner: ^2.10.4
+  flutter_test:
+    sdk: flutter
+  freezed: ^3.2.4
+  json_serializable: ^6.11.3
+  mocktail: ^1.0.4
+  very_good_analysis: ^10.0.0

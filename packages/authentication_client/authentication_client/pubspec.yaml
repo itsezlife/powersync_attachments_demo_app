@@ -1,0 +1,20 @@
+name: authentication_client
+description: An Authentication Client Interface.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.8.0"
+  flutter: ">=3.27.2"
+
+dependencies:
+  equatable: ^2.0.8
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.12.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.2
+  very_good_analysis: ^10.0.0

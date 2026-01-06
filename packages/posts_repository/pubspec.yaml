@@ -1,0 +1,26 @@
+name: posts_repository
+description: A Very Good Project created by Very Good CLI.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.8.0"
+  flutter: ">=3.27.2"
+
+dependencies:
+  database_client:
+    path: ../database_client/database_client
+  equatable: ^2.0.5
+  flutter:
+    sdk: flutter
+  rxdart: ^0.28.0
+  shared:
+    path: ../shared
+  user_repository:
+    path: ../user_repository
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  very_good_analysis: ^9.0.0

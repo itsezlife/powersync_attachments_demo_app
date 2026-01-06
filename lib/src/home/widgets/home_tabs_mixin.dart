@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:octopus/octopus.dart';
-import 'package:powersync_attachments_example/src/app/router/tabs.dart';
+import 'package:powersync_attachments_example/src/app/router/guards/tabs.dart';
 import 'package:powersync_attachments_example/src/common/models/nav_bar_tab.dart';
 import 'package:powersync_attachments_example/src/navigation/view/navigation_bar.dart';
 

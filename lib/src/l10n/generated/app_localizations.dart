@@ -110,8 +110,266 @@ abstract class AppLocalizations {
   /// The label for the bottom navigation bar tab.
   ///
   /// In en, this message translates to:
-  /// **'{tab, select, main{Home} menu{Menu} other{Other}}'**
+  /// **'{tab, select, main{Home} createPost{Create Post} profile{Profile} other{Other}}'**
   String bottomNavBarTabLabel(String tab);
+
+  /// No description provided for @genericErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong! Try again later.'**
+  String get genericErrorTitle;
+
+  /// No description provided for @networkErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet connection error!'**
+  String get networkErrorTitle;
+
+  /// No description provided for @networkErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your internet connection and try again.'**
+  String get networkErrorDescription;
+
+  /// No description provided for @invalidCredentialsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email and/or password are incorrect.'**
+  String get invalidCredentialsTitle;
+
+  /// No description provided for @userNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'User with this email not found!'**
+  String get userNotFoundTitle;
+
+  /// No description provided for @userNotFoundDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Try to sign up.'**
+  String get userNotFoundDescription;
+
+  /// No description provided for @googleLogInFailureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google login failed!'**
+  String get googleLogInFailureTitle;
+
+  /// No description provided for @googleLogInFailureDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again later.'**
+  String get googleLogInFailureDescription;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @emailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email'**
+  String get emailHint;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get passwordHint;
+
+  /// No description provided for @signInButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signInButtonLabel;
+
+  /// No description provided for @signUpButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up'**
+  String get signUpButtonLabel;
+
+  /// No description provided for @forgotPasswordButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPasswordButtonLabel;
+
+  /// No description provided for @signInWithGoogleButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get signInWithGoogleButtonLabel;
+
+  /// No description provided for @signInWithEmailButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Email'**
+  String get signInWithEmailButtonLabel;
+
+  /// No description provided for @signUpNewAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? <a action=\'CHANGE_AUTH\'>Sign up</a>'**
+  String get signUpNewAccountLabel;
+
+  /// No description provided for @signInNewAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? <a action=\'CHANGE_AUTH\'>Sign in</a>'**
+  String get signInNewAccountLabel;
+
+  /// No description provided for @firstNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get firstNameLabel;
+
+  /// No description provided for @firstNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your first name'**
+  String get firstNameHint;
+
+  /// No description provided for @lastNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get lastNameLabel;
+
+  /// No description provided for @lastNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your last name'**
+  String get lastNameHint;
+
+  /// No description provided for @phoneNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get phoneNumberLabel;
+
+  /// No description provided for @phoneNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your phone number'**
+  String get phoneNumberHint;
+
+  /// No description provided for @avatarLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get avatarLabel;
+
+  /// No description provided for @avatarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload your avatar'**
+  String get avatarHint;
+
+  /// No description provided for @signUpInProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing up...'**
+  String get signUpInProgressLabel;
+
+  /// No description provided for @userWithThisEmailAlreadyExistsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'User with this email already exists.'**
+  String get userWithThisEmailAlreadyExistsTitle;
+
+  /// No description provided for @userWithThisEmailAlreadyExistsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another email address.'**
+  String get userWithThisEmailAlreadyExistsDescription;
+
+  /// No description provided for @logOutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get logOutLabel;
+
+  /// No description provided for @logOutConfirmationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to log out?'**
+  String get logOutConfirmationLabel;
+
+  /// No description provided for @postUploadFailedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Post upload failed. Please try again later.'**
+  String get postUploadFailedLabel;
+
+  /// No description provided for @postCreateFailedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Post creation failed. Please try again later.'**
+  String get postCreateFailedLabel;
+
+  /// No description provided for @createPostHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write something...'**
+  String get createPostHint;
+
+  /// No description provided for @createPostButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Create post'**
+  String get createPostButtonLabel;
+
+  /// No description provided for @addPostPhotosLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos'**
+  String get addPostPhotosLabel;
+
+  /// No description provided for @publishButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish'**
+  String get publishButtonLabel;
+
+  /// No description provided for @tryAgainLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgainLabel;
+
+  /// No description provided for @genericErrorReloadLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. <b>Tap to reload</b>'**
+  String get genericErrorReloadLabel;
+
+  /// No description provided for @genericErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your internet connection and try again.'**
+  String get genericErrorDescription;
+
+  /// No description provided for @refreshLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refreshLabel;
+
+  /// No description provided for @noPostsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet'**
+  String get noPostsTitle;
 }
 
 class _AppLocalizationsDelegate

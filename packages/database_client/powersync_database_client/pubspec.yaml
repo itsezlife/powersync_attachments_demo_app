@@ -1,0 +1,27 @@
+name: powersync_database_client
+description: A PowerSync database implementation of the base DatabaseClient interface.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.8.0"
+  flutter: ">=3.27.2"
+
+dependencies:
+  collection: ^1.19.1
+  database_client:
+    path: ../database_client
+  flutter:
+    sdk: flutter
+  powersync_client:
+    path: ../../powersync_client
+  rxdart: ^0.28.0
+  shared:
+    path: ../../shared
+  synchronized: ^3.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  very_good_analysis: ^10.0.0
