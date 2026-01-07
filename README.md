@@ -1,10 +1,11 @@
 # PowerSync Attachments Helper Example
 
-https://github.com/user-attachments/assets/73a7e85e-e59e-418f-a9b5-ddc1000b2d93
-
 A Flutter demo application showcasing PowerSync Attachments Helper API usage with Supabase backend.
 
 _This demo showcases real-time post synchronization with attachment uploads using [PowerSync][powersync] and [Supabase][supabase]._
+
+https://github.com/user-attachments/assets/73a7e85e-e59e-418f-a9b5-ddc1000b2d93
+
 
 [powersync]: https://powersync.com
 [supabase]: https://supabase.com
