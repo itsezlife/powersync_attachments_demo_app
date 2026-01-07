@@ -50,10 +50,6 @@ List<DiffUpdate> calculatePostsChangesDiff(List<dynamic> args) {
   final newList = args[1] as List<Post>;
   final excludedDiffs = args[2] as List<DiffUpdateType>;
 
-  // This algorithm assumes the `Message` class has a correct implementation
-  // of `operator==` and `hashCode`. If not, it will fail to detect
-  // matches and produce incorrect diffs.
-
   final updates = <DiffUpdate>[];
 
   if (!excludedDiffs.contains(DiffUpdateType.insert)) {
