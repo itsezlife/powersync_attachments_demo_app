@@ -93,9 +93,9 @@ COMMENT ON FUNCTION is_post_owner(uuid) IS
 DO $$
 BEGIN
     DROP POLICY IF EXISTS "Anyone can view post attachments" ON storage.objects;
-    DROP POLICY IF EXISTS "Authenticated users can upload post attachments" ON storage.objects;
-    DROP POLICY IF EXISTS "Authenticated users can update post attachments" ON storage.objects;
-    DROP POLICY IF EXISTS "Authenticated users can delete post attachments" ON storage.objects;
+    DROP POLICY IF EXISTS "Users can upload post attachments" ON storage.objects;
+    DROP POLICY IF EXISTS "Users can update post attachments" ON storage.objects;
+    DROP POLICY IF EXISTS "Users can delete post attachments" ON storage.objects;
     DROP POLICY IF EXISTS "Users can update their own post attachments" ON storage.objects;
     DROP POLICY IF EXISTS "Users can delete their own post attachments" ON storage.objects;
     
