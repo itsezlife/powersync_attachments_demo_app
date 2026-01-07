@@ -5,7 +5,7 @@ import 'package:powersync_attachments_example/src/common/constant/app_spacing.da
 import 'package:powersync_attachments_example/src/common/extensions/build_context_extension.dart';
 import 'package:powersync_attachments_example/src/common/extensions/show_dialog_extension.dart';
 import 'package:powersync_attachments_example/src/l10n/l10n.dart';
-import 'package:powersync_attachments_example/src/menu/widgets/setting_tile.dart';
+import 'package:powersync_attachments_example/src/settings/widgets/setting_tile.dart';
 
 class LogOutTile extends StatelessWidget {
   const LogOutTile({super.key});

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:octopus/octopus.dart';
+import 'package:powersync_attachments_example/src/app/router/routes.dart';
 import 'package:powersync_attachments_example/src/common/widgets/app_scaffold.dart';
 import 'package:powersync_attachments_example/src/common/widgets/scaffold_padding.dart';
 import 'package:powersync_attachments_example/src/common/widgets/skeletonizer_container_theme_override.dart';
@@ -19,7 +21,20 @@ class UserProfileView extends StatelessWidget {
   Widget build(BuildContext context) => AppScaffold(
     body: CustomScrollView(
       slivers: [
-        const SliverAppBar(title: Text('User Profile')),
+        SliverAppBar(
+          title: const Text('User Profile'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                context.octopus.push(Routes.settings);
+              },
+              icon: const Icon(Icons.settings),
+            ),
+          ],
+          pinned: true,
+          floating: true,
+          snap: true,
+        ),
         ScaffoldPadding.sliver(
           context,
           horizontalPadding: 0,

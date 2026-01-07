@@ -4,13 +4,15 @@ import 'package:powersync_attachments_example/src/auth/auth.dart';
 import 'package:powersync_attachments_example/src/feed/view/feed_view.dart';
 import 'package:powersync_attachments_example/src/home/view/home_view.dart';
 import 'package:powersync_attachments_example/src/posts/create_post/create_post.dart';
-import 'package:powersync_attachments_example/src/user_profile/view/user_page.dart';
+import 'package:powersync_attachments_example/src/settings/view/settings_view.dart';
+import 'package:powersync_attachments_example/src/user_profile/view/user_profile_page.dart';
 
 enum Routes with OctopusRoute {
   home('home', title: 'Home'),
   feed('feed', title: 'Feed'),
   profile('profile', title: 'Profile'),
   auth('auth', title: 'Auth'),
+  settings('settings', title: 'Settings'),
   createPost('createPost', title: 'Create Post');
 
   const Routes(this.name, {this.title});
@@ -38,6 +40,8 @@ enum Routes with OctopusRoute {
         return AuthPage(showLogin: showLogin);
       case Routes.createPost:
         return const CreatePostView();
+      case Routes.settings:
+        return const SettingsView();
     }
   }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:powersync_attachments_example/src/common/constant/app_spacing.dart';
 import 'package:powersync_attachments_example/src/common/extensions/build_context_extension.dart';
 import 'package:powersync_attachments_example/src/common/widgets/cached_network_image_with_minithumbnail.dart';
 import 'package:shared/shared.dart';
@@ -19,7 +20,7 @@ class PostAttachment extends StatelessWidget {
   static const double height = 200;
   static const double width = 200;
 
-  static const double _kMinimumProgress = 0.02;
+  static const double _kMinimumProgress = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +132,10 @@ class PostAttachmentProgress extends StatelessWidget {
     child: showSuccessCheckmark
         ? Container(
             key: const ValueKey('success'),
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
@@ -144,7 +148,10 @@ class PostAttachmentProgress extends StatelessWidget {
           )
         : Container(
             key: const ValueKey('progress'),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(12),
