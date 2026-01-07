@@ -40,6 +40,7 @@ bool _areAttachmentListsSame(
   return true;
 }
 
+// Simple comparison of attachments
 bool _areAttachmentsSame(Attachment oldAttachment, Attachment newAttachment) =>
     oldAttachment.type == newAttachment.type &&
     oldAttachment.imageUrl == newAttachment.imageUrl &&
