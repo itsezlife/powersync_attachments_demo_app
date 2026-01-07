@@ -1,0 +1,30 @@
+name: user_repository
+description: A package that manages user flow.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.8.0"
+  flutter: ">=3.27.2"
+
+dependencies:
+  authentication_client:
+    path: ../authentication_client/authentication_client
+  database_client:
+    path: ../database_client/database_client
+  flutter:
+    sdk: flutter
+  json_annotation: ^4.9.0
+  powersync_client:
+    path: ../powersync_client
+  rxdart: ^0.28.0
+  shared:
+    path: ../shared
+
+dev_dependencies:
+  build_runner: ^2.10.4
+  flutter_test:
+    sdk: flutter
+  json_serializable: ^6.11.3
+  mocktail: ^1.0.0
+  very_good_analysis: ^10.0.0

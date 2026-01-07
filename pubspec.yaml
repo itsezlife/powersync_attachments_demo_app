@@ -28,35 +28,86 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  animations: ^2.1.1
+
+  # State management
+  bloc: ^9.2.0
+  provider: ^6.1.5+1
+  flutter_bloc: ^9.1.1
+
+  # Images
+  cached_network_image: ^3.4.1
+
   flutter:
     sdk: flutter
-
-  ## Localization
-  flutter_localizations:
-    sdk: flutter
-  intl: ^0.20.2
 
   # UI packages
   cupertino_icons: ^1.0.8
 
-  # PowerSync
-  powersync: ^1.17.0
+  # Localization
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+
+  # Sign in with Google
+  google_sign_in: ^6.2.1
+  image_picker: ^1.2.1
+  insta_assets_crop: ^0.1.2
+
+  # Assets picker
+  insta_assets_picker: ^3.4.0
 
   # Router
   octopus:
     git:
       url: https://github.com/itsezlife/octopus.git
 
+  # Local packages
+  shared:
+    path: packages/shared
+  persistent_storage:
+    path: packages/storage/persistent_storage
+  posts_repository:
+    path: packages/posts_repository
+  powersync_client:
+    path: packages/powersync_client
+  powersync_database_client:
+    path: packages/database_client/powersync_database_client
+  user_repository:
+    path: packages/user_repository
+  supabase_authentication_client:
+    path: packages/authentication_client/supabase_authentication_client
+  form_fields:
+    path: packages/form_fields
+
+  # Rich styled text
+  styled_text:
+    git:
+      ref: 91272c4779123570a642b19f96214adef2e850b4
+      url: https://github.com/Maatteogekko/styled_text_package
+      path: styled_text
+
+  # Slivers
+  super_sliver_list: ^0.4.1
+  sliver_tools: ^0.2.12
+
+  # Skeletonizers
+  skeletonizer: ^2.1.2
+
   # Utils
+  equatable: ^2.0.8
+  path_provider: ^2.1.5
+  throttling: ^2.0.1
+
+  # Annotations
   collection: ^1.19.1
+  meta: ^1.16.0
 
 dev_dependencies:
+  build_runner: ^2.10.4
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
-
-  # Code generation
-  build_runner: ^2.10.4
 
 flutter:
   generate: true

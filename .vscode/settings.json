@@ -1,31 +1,33 @@
 {
   "[dart]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
-    "editor.suggest.snippetsPreventQuickSuggestions": false,
-    "editor.suggestSelection": "first",
-    "editor.tabCompletion": "onlySnippets",
-    "editor.wordBasedSuggestions": "off",
-    "editor.selectionHighlight": false,
-    "editor.defaultFormatter": "Dart-Code.dart-code",
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true,
-    "editor.formatOnPaste": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
     },
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.insertSpaces": true,
+    "editor.links": true,
     "editor.quickSuggestions": {
       "comments": "on",
-      "strings": "on",
-      "other": "on"
+      "other": "on",
+      "strings": "on"
     },
-    "editor.links": true,
     "editor.rulers": [
       80
-    ]
+    ],
+    "editor.selectionHighlight": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.tabSize": 2,
+    "editor.wordBasedSuggestions": "off"
   },
-  "dart.lineLength": 80,
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
   "dart.doNotFormat": [
     "**.g.dart",
     "**.gql.dart",
@@ -38,31 +40,43 @@
     "**.pbjson.dart",
     "**/generated/**"
   ],
-  // Flutter Version Manager
-  //"dart.flutterSdkPath": ".fvm/flutter_sdk",
-  // Remove .fvm files from search
-  "search.exclude": {
-    //"**/.fvm": true,
-    ".dart_tool": true,
-    "coverage": true,
-    "build": true
-  },
-  // Remove from file watching
-  "files.watcherExclude": {
-    //"**/.fvm": true,
-    ".dart_tool": true,
-    "coverage": true,
-    "build": true
-  },
-  // Causes the debug view to automatically appear when a breakpoint is hit. This
-  // setting is global and not configurable per-language.
+  "dart.lineLength": 80,
   "debug.openDebug": "openOnDebugBreak",
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
-    "pubspec.yaml": ".flutter-plugins, .packages, .dart_tool, .flutter-plugins-dependencies, .metadata, .packages, pubspec.lock, build.yaml, analysis_options.yaml, all_lint_rules.yaml, dart*.yaml, flutter*.yaml, icons_launcher.yaml",
+    "*.dart": "$(capture).g.dart, $(capture).freezed.dart, $(capture).config.dart",
     ".gitignore": ".gitattributes, .gitmodules, .gitmessage, .mailmap, .git-blame*",
-    "readme.*": "authors, backers.md, changelog*, citation*, code_of_conduct.md, codeowners, contributing.md, contributors, copying, credits, governance.md, history.md, license*, maintainers, readme*, security.md, sponsors.md",
-    "*.dart": "$(capture).g.dart, $(capture).freezed.dart, $(capture).config.dart"
+    "pubspec.yaml": ".flutter-plugins, .packages, .dart_tool, .flutter-plugins-dependencies, .metadata, .packages, pubspec.lock, build.yaml, analysis_options.yaml, all_lint_rules.yaml, dart*.yaml, flutter*.yaml, icons_launcher.yaml",
+    "readme.*": "authors, backers.md, changelog*, citation*, code_of_conduct.md, codeowners, contributing.md, contributors, copying, credits, governance.md, history.md, license*, maintainers, readme*, security.md, sponsors.md"
   },
+  "files.watcherExclude": {
+    ".dart_tool": true,
+    "build": true,
+    "coverage": true
+  },
+  "search.exclude": {
+    ".dart_tool": true,
+    "build": true,
+    "coverage": true
+  }
 }

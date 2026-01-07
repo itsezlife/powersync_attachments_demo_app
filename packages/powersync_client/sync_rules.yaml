@@ -1,0 +1,31 @@
+# Define sync rules to control which data is synced to each user
+# See the docs: https://docs.powersync.com/usage/sync-rules
+bucket_definitions:
+  # Sync all users - everyone can see all users
+  users:
+    data:
+      - SELECT
+        id, name, email, avatar_url, created_at, updated_at
+        FROM users
+
+  # Sync current user - only the current user can see their own data
+  current_user:
+    parameters: SELECT id as user_id from users where request.user_id()
+    data:
+      - SELECT
+        id, name, email, avatar_url, created_at, updated_at
+        FROM users WHERE id = bucket.user_id
+
+  # Sync all user's posts and their attachments
+  posts_and_attachments:
+    data:
+      - SELECT
+        id, user_id, content, created_at, updated_at
+        FROM posts
+      - SELECT
+        id, post_id, type, title_link, title, thumb_url, text, pretext,
+        og_scrape_url, image_url, footer_icon, footer, fields, fallback,
+        color, author_name, author_link, author_icon, asset_url, actions,
+        original_width, original_height, file_size, mime_type, minithumbnail,
+        created_at, updated_at
+        FROM post_attachments

@@ -5,8 +5,8 @@ import 'dart:developer';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:octopus/octopus.dart';
+import 'package:powersync_attachments_example/src/app/router/guards/tabs.dart';
 import 'package:powersync_attachments_example/src/app/router/routes.dart';
-import 'package:powersync_attachments_example/src/app/router/tabs.dart';
 
 /// {@template route_tracker}
 /// A service that tracks the current route and provides utilities

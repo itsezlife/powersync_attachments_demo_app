@@ -5,6 +5,7 @@
       "name": "Run App (Debug)",
       "type": "dart",
       "request": "launch",
+      "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/",
       "args": [
         "--dart-define-from-file=config/development.json",
@@ -17,6 +18,7 @@
       "name": "Web server (Debug)",
       "type": "dart",
       "request": "launch",
+      "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/",
       "args": [
         "--dart-define-from-file=config/development.json",
