@@ -3,9 +3,9 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insta_assets_picker/insta_assets_picker.dart';
@@ -47,6 +47,9 @@ class PostMediaArgs extends Equatable {
     cropRect,
   ];
 }
+
+void createFile(List<dynamic> message) =>
+    File(message[1] as String).writeAsBytesSync(message[0] as List<int>);
 
 class PostsController {
   factory PostsController() => _instance;
@@ -128,14 +131,105 @@ class PostsController {
       attachments.add(attachment);
     }
 
+    final futures = <Future<void>>[];
+    for (final attachment in attachments) {
+      futures.add(
+        compute(createFile, [
+          attachment.file!.bytes!,
+          Config.appDocsPath.resolveFilePath(attachment.file!.name!),
+        ]),
+      );
+    }
+    unawaited(Future.wait(futures));
+
     uploadPost(attachments: attachments);
   }
 }
 
 class PostProvider with ChangeNotifier {
+  PostProvider({required this.powerSyncClient}) {
+    _initializeProgressFromLocalPosts();
+  }
+
+  final PowerSyncClient powerSyncClient;
+
   List<PostProgress> _progress = [];
+  final Map<String, StreamSubscription<void>> _progressListeners = {};
+  StreamSubscription<void>? _postsLocalWatcher;
 
   List<PostProgress> get progress => _progress;
+
+  /// Initialize progress tracking from existing posts_local records
+  Future<void> _initializeProgressFromLocalPosts() async {
+    try {
+      // Query all posts from posts_local table
+      final localPosts = await powerSyncClient.db().getAll(
+        'SELECT id FROM posts_local',
+      );
+
+      // Add progress for each local post
+      for (final post in localPosts) {
+        final postId = post['id'] as String;
+        if (_progress.indexWhere((p) => p.postId == postId) == -1) {
+          final localAttachment = await powerSyncClient.db().getOptional(
+            'SELECT image_url FROM post_attachments_local WHERE post_id = ? '
+            'ORDER BY created_at DESC LIMIT 1',
+            [postId],
+          );
+          if (localAttachment == null) continue;
+          _progress.add(
+            PostProgress(
+              postId: postId,
+              asset: null, // No asset available when restoring from DB
+              file: File(
+                Config.appDocsPath.resolveFilePath(
+                  localAttachment['image_url'] as String,
+                ),
+              ),
+              value: 0,
+            ),
+          );
+
+          // Start watching progress for this post
+          _startWatchingProgress(postId);
+        }
+      }
+
+      if (_progress.isNotEmpty) {
+        notifyListeners();
+      }
+
+      // Start watching posts_local for deletions
+      _startWatchingPostsLocal();
+    } on Object catch (e) {
+      log(
+        'Error initializing progress from local posts: $e',
+        name: 'PostProvider',
+      );
+    }
+  }
+
+  /// Watch posts_local table for deletions to remove progress
+  void _startWatchingPostsLocal() {
+    _postsLocalWatcher?.cancel();
+
+    final stream = powerSyncClient.db().watch('SELECT id FROM posts_local');
+
+    _postsLocalWatcher = stream.listen((results) {
+      // Get list of post IDs still in posts_local
+      final activePostIds = results.map((r) => r['id'] as String).toSet();
+
+      // Remove progress for posts that are no longer in posts_local
+      final progressToRemove = <String>[];
+      for (final p in _progress) {
+        if (!activePostIds.contains(p.postId)) {
+          progressToRemove.add(p.postId);
+        }
+      }
+
+      progressToRemove.forEach(removeProgress);
+    });
+  }
 
   PostProgress? _addProgress(String postId, AssetEntity asset) {
     final list = [..._progress];
@@ -143,6 +237,10 @@ class PostProvider with ChangeNotifier {
     final p = PostProgress(postId: postId, asset: asset, value: 0);
     _progress = [p, ...list];
     notifyListeners();
+
+    // Start watching upload progress
+    _startWatchingProgress(postId);
+
     return p;
   }
 
@@ -166,7 +264,88 @@ class PostProvider with ChangeNotifier {
     if (index == -1) return;
     list.removeAt(index);
     _progress = list;
+
+    // Cancel progress listener
+    _progressListeners[postId]?.cancel();
+    _progressListeners.remove(postId);
+
     notifyListeners();
+  }
+
+  /// Query post_attachments_local by post_id and calculate upload progress
+  Future<double> _calculateUploadProgress(String postId) async {
+    try {
+      final results = await powerSyncClient.db().getAll(
+        '''
+        SELECT file_size, sent 
+        FROM post_attachments_local 
+        WHERE post_id = ?
+        ''',
+        [postId],
+      );
+
+      if (results.isEmpty) {
+        return 0.0;
+      }
+
+      var totalBytes = 0;
+      var sentBytes = 0;
+
+      for (final row in results) {
+        final fileSize = row['file_size'] as int? ?? 0;
+        final sent = row['sent'] as int? ?? 0;
+        totalBytes += fileSize;
+        sentBytes += sent;
+      }
+
+      if (totalBytes == 0) {
+        return 0.0;
+      }
+
+      final progress = sentBytes / totalBytes;
+      return progress.clamp(0.0, 1.0);
+    } on Object catch (e) {
+      log('Error calculating upload progress: $e', name: 'PostProvider');
+      return 0.0;
+    }
+  }
+
+  /// Start watching upload progress for a post
+  void _startWatchingProgress(String postId) {
+    // Cancel existing listener if any
+    _progressListeners[postId]?.cancel();
+
+    // Watch for changes in post_attachments_local for this post
+    final stream = powerSyncClient.db().watch(
+      '''
+      SELECT file_size, sent 
+      FROM post_attachments_local 
+      WHERE post_id = ?
+      ''',
+      parameters: [postId],
+    );
+
+    _progressListeners[postId] = stream.listen((_) async {
+      final progress = await _calculateUploadProgress(postId);
+      _updateProgress(postId, progress);
+
+      // Progress will be automatically removed when the post is deleted
+      // from posts_local via _startWatchingPostsLocal()
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel all progress listeners
+    for (final subscription in _progressListeners.values) {
+      subscription.cancel();
+    }
+    _progressListeners.clear();
+
+    // Cancel posts_local watcher
+    _postsLocalWatcher?.cancel();
+
+    super.dispose();
   }
 
   Future<void> uploadPost({
@@ -250,7 +429,7 @@ class PostProvider with ChangeNotifier {
             cropRect: processedAsset.cropRect,
           ),
         );
-        _updateProgress(postId, progressValue);
+        // _updateProgress(postId, progressValue);
       }
 
       if (attachmentArgs.isEmpty) {
@@ -267,11 +446,11 @@ class PostProvider with ChangeNotifier {
           postId: postId,
           content: content,
         );
-        _updateProgress(postId, 1);
-        Future<void>.delayed(
-          const Duration(seconds: 1),
-          () => removeProgress(postId),
-        );
+        // _updateProgress(postId, 1);
+        // Future<void>.delayed(
+        //   const Duration(seconds: 1),
+        //   () => removeProgress(postId),
+        // );
       } catch (_) {
         _updateProgress(postId, 1, hasError: true);
         rethrow;

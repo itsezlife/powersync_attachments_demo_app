@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:insta_assets_picker/insta_assets_picker.dart';
 
@@ -8,8 +10,9 @@ class PostProgress extends Equatable {
   /// {@macro post_progress}
   const PostProgress({
     required this.postId,
-    required this.asset,
     required this.value,
+    this.file,
+    this.asset,
     this.hasError,
   });
 
@@ -17,7 +20,12 @@ class PostProgress extends Equatable {
   final String postId;
 
   /// The asset entity.
-  final AssetEntity asset;
+  /// Null when progress is restored from database on app restart.
+  final AssetEntity? asset;
+
+  /// The file.
+  /// Exists only when progress is restored from database on app restart.
+  final File? file;
 
   /// The progress value.
   final double value;
@@ -26,5 +34,5 @@ class PostProgress extends Equatable {
   final bool? hasError;
 
   @override
-  List<Object?> get props => [postId, asset, value, hasError];
+  List<Object?> get props => [postId, asset, file, value, hasError];
 }

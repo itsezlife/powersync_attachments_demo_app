@@ -2,7 +2,7 @@
   "@@locale": "en",
   "language": "English",
   "languageEn": "English",
-  "bottomNavBarTabLabel": "{tab, select, main{Home} createPost{Create Post} profile{Profile} other{Other}}",
+  "bottomNavBarTabLabel": "{tab, select, feed{Feed} createPost{Create Post} profile{Profile} other{Other}}",
   "@bottomNavBarTabLabel": {
     "description": "The label for the bottom navigation bar tab.",
     "placeholders": {

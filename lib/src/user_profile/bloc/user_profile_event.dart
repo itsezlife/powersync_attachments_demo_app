@@ -33,17 +33,6 @@ final class UserProfilePostsRefreshRequested extends UserProfileEvent {
   const UserProfilePostsRefreshRequested();
 }
 
-final class UserProfilePostsChanged extends UserProfileEvent {
-  const UserProfilePostsChanged(this.payload, {this.newPost});
-
-  final ({Map<String, dynamic> newRecord, Map<String, dynamic> oldRecord})
-  payload;
-  final Post? newPost;
-
-  @override
-  List<Object?> get props => [payload, newPost];
-}
-
 final class UserProfilePostCreateStartRequested extends UserProfileEvent {
   const UserProfilePostCreateStartRequested();
 }
@@ -57,7 +46,7 @@ final class UserProfilePostCreateRequested extends UserProfileEvent {
 
   final String postId;
   final String? content;
-  final List<Attachment> attachments;
+  final List<shared.Attachment> attachments;
 
   @override
   List<Object?> get props => [postId, content, attachments];
@@ -70,4 +59,17 @@ final class UserProfilePostDeleteRequested extends UserProfileEvent {
 
   @override
   List<Object> get props => [postId];
+}
+
+final class UserProfilePostsUpdateRequested extends UserProfileEvent {
+  const UserProfilePostsUpdateRequested(
+    this.posts, {
+    this.excludedDiffs = const [],
+  });
+
+  final List<Post> posts;
+  final List<DiffUpdateType> excludedDiffs;
+
+  @override
+  List<Object> get props => [posts];
 }

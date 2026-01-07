@@ -19,7 +19,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String bottomNavBarTabLabel(String tab) {
     String _temp0 = intl.Intl.selectLogic(tab, {
-      'main': 'Home',
+      'feed': 'Feed',
       'createPost': 'Create Post',
       'profile': 'Profile',
       'other': 'Other',

@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:database_client/database_client.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:powersync_client/powersync_client.dart';
+import 'package:powersync_database_client/src/posts_database_utils.dart';
 import 'package:shared/shared.dart' as shared show Attachment;
 import 'package:shared/shared.dart' hide Attachment;
 
@@ -95,9 +95,9 @@ class PowerSyncDatabaseClient extends DatabaseClient {
             thumb_url, text, pretext, og_scrape_url, image_url, footer_icon,
             footer, fields, fallback, color, author_name, author_link,
             author_icon, asset_url, original_width, original_height,
-            file_size, mime_type, minithumbnail, created_at, updated_at) VALUES
+            file_size, mime_type, minithumbnail, created_at, updated_at, sent) VALUES
             (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?)
+            ?, ?, ?, ?, ?)
           ''',
               [
                 for (final (index, attachment) in attachments.indexed)
@@ -135,6 +135,10 @@ class PowerSyncDatabaseClient extends DatabaseClient {
                     currentLocalTime
                         .add(Duration(seconds: index * 2))
                         .toIso8601String(),
+                    if (attachment.uploadState.isSuccess)
+                      attachment.fileSize ?? attachment.file!.size
+                    else
+                      0,
                   ],
               ],
             );
@@ -224,102 +228,6 @@ class PowerSyncDatabaseClient extends DatabaseClient {
     }
   }
 
-  static List<List<Map<String, dynamic>>?> _computeJsonListAttachments(
-    List<dynamic> args,
-  ) {
-    final rootToken = args[0] as RootIsolateToken;
-    BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
-    final jsonListAttachments = args[1] as List<String?>;
-    if (jsonListAttachments.isEmpty) return [];
-
-    final listAttachments = jsonListAttachments
-        .map(
-          (jsonAttachment) =>
-              jsonAttachment == null ||
-                        jsonAttachment.isEmpty ||
-                        jsonAttachment == 'null'
-                    ? null
-                    : (jsonDecode(jsonAttachment) as List<dynamic>)
-                          .cast<Map<String, dynamic>>()
-                ?..removeWhere((e) => e['id'] == null)
-                ..forEach((attachment) {
-                  if (attachment['minithumbnail']
-                      case final String minithumbnail
-                      when minithumbnail.isNotEmpty) {
-                    attachment['minithumbnail'] =
-                        jsonDecode(minithumbnail) as Map<String, dynamic>;
-                  }
-                }),
-        )
-        .toList();
-
-    return listAttachments;
-  }
-
-  static List<Map<String, dynamic>?> _computeJsonListAuthor(
-    List<dynamic> args,
-  ) {
-    final rootToken = args[0] as RootIsolateToken;
-    BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
-    final jsonListAuthor = args[1] as List<String?>;
-    final listAuthor = <Map<String, dynamic>?>[];
-    for (final jsonAuthor in jsonListAuthor) {
-      if (jsonAuthor == null || jsonAuthor.isEmpty) {
-        listAuthor.add(null);
-        continue;
-      }
-      final json = jsonDecode(jsonAuthor) as Map<String, dynamic>;
-      if (json['id'] == null) {
-        listAuthor.add(null);
-        continue;
-      }
-      listAuthor.add(json);
-    }
-    return listAuthor;
-  }
-
-  Future<List<Post>> _parsePosts(
-    List<Map<String, dynamic>> result,
-  ) async {
-    final jsonListAttachments = result.map((row) {
-      final json = Map<String, dynamic>.from(row);
-      return json['attachments'] as String?;
-    }).toList();
-
-    final rootToken = RootIsolateToken.instance!;
-    final listAttachments = await compute(
-      _computeJsonListAttachments,
-      [rootToken, jsonListAttachments],
-    );
-
-    final jsonListAuthor = result.map((row) {
-      final json = Map<String, dynamic>.from(row);
-      return json['author'] as String?;
-    }).toList();
-
-    final listAuthor = await compute(
-      _computeJsonListAuthor,
-      [rootToken, jsonListAuthor],
-    );
-
-    final posts = <Post>[];
-    for (var i = 0; i < result.length; i++) {
-      final json = Map<String, dynamic>.from(result[i]);
-      final attachments = listAttachments[i];
-      json['attachments'] = attachments;
-
-      final authorJson = listAuthor[i];
-      if (authorJson != null) {
-        json['author'] = authorJson;
-      }
-
-      final post = Post.fromJson(json);
-
-      posts.add(post);
-    }
-    return posts;
-  }
-
   @override
   Future<List<Post>> fetchPosts({
     required int limit,
@@ -373,13 +281,22 @@ class PowerSyncDatabaseClient extends DatabaseClient {
         ) as author
         FROM posts p
         LEFT JOIN users s ON p.user_id = s.id
-        WHERE p.user_id = ?
+        ${userId != null ? 'WHERE p.user_id = ?' : ''}
         ORDER BY p.created_at DESC
         LIMIT ? OFFSET ?
         ''',
-          [userId, limit, offset],
+          [?userId, limit, offset],
         );
-        return _parsePosts(posts);
+        return PostsDatabaseUtils.parsePosts(
+          posts,
+          getAttachmentImageUrl: (postId, attachmentName) {
+            return _powerSyncClient.getPublicUrl(
+              storageBucket: 'post_attachments',
+              name: attachmentName,
+              path: (name) => '$postId/$name',
+            );
+          },
+        );
       });
     } on NotAuthenticatedException {
       rethrow;

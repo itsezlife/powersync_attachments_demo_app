@@ -4,6 +4,29 @@ import 'package:shared/shared.dart';
 
 part 'post.g.dart';
 
+/// {@template bool_json_converter}
+/// A converter for [bool] to [int] and vice versa.
+/// {@endtemplate}
+class BoolJsonConverter implements JsonConverter<bool, Object> {
+  /// {@macro bool_json_converter}
+  const BoolJsonConverter({this.defaultValue = false});
+
+  /// The default value to return if the JSON value is null.
+  final bool defaultValue;
+
+  @override
+  bool fromJson(Object json) {
+    return switch (json) {
+      final int value => value != 0,
+      final bool value => value,
+      _ => defaultValue,
+    };
+  }
+
+  @override
+  bool toJson(bool object) => object;
+}
+
 /// {@template date_time_from_milliseconds_since_epoch}
 /// A converter for [DateTime] that matches the format of the database.
 /// {@endtemplate}
@@ -59,6 +82,7 @@ class Post extends Equatable {
     required this.updatedAt,
     required this.author,
     this.attachments = const [],
+    this.localOnly = false,
   });
 
   /// Create a new instance from a json
@@ -86,8 +110,33 @@ class Post extends Equatable {
   @DateTimeFromMillisecondsSinceEpoch()
   final DateTime updatedAt;
 
+  /// Whether the post is local only.
+  @BoolJsonConverter()
+  final bool localOnly;
+
   /// Serialize to json
   Map<String, dynamic> toJson() => _$PostToJson(this);
+
+  /// Create a new instance with the given properties changed.
+  Post copyWith({
+    String? id,
+    String? content,
+    PostAuthor? author,
+    List<Attachment>? attachments,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? localOnly,
+  }) {
+    return Post(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      author: author ?? this.author,
+      attachments: attachments ?? this.attachments,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      localOnly: localOnly ?? this.localOnly,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -97,5 +146,6 @@ class Post extends Equatable {
     attachments,
     createdAt,
     updatedAt,
+    localOnly,
   ];
 }

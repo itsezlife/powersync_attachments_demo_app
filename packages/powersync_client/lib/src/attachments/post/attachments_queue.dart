@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:powersync_client/src/attachments/supabase_storage_adapter.dart';
+import 'package:powersync_client/src/attachments/post/supabase_storage_adapter.dart';
 import 'package:powersync_core/attachments/attachments.dart';
 import 'package:powersync_core/attachments/io.dart';
 import 'package:powersync_core/powersync_core.dart';
 
 /// The attachment queue
-late AttachmentQueue attachmentQueue;
+late AttachmentQueue postAttachmentQueue;
 
 /// Initialize the attachment queue
-Future<AttachmentQueue> initializeAttachmentQueue(
+Future<AttachmentQueue> initializePostAttachmentQueue(
   PowerSyncDatabase db,
   RemoteStorage remoteStorage,
 ) async {
@@ -42,7 +42,7 @@ Future<AttachmentQueue> initializeAttachmentQueue(
     downloadAttachments: false,
   );
 
-  attachmentQueue = queue;
+  postAttachmentQueue = queue;
 
   return queue;
 }

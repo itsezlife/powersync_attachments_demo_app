@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 
-/// The main outlined icon.
-const mainInactiveIcon = Icon(Icons.home_outlined);
+/// The feed outlined icon.
+const feedInactiveIcon = Icon(Icons.home_outlined);
 
-/// The main rounded icon.
-const mainActiveIcon = Icon(Icons.home_rounded);
+/// The feed rounded icon.
+const feedActiveIcon = Icon(Icons.home_rounded);
 
 /// The settings outlined icon.
 const profileInactiveIcon = Icon(Icons.person_outline);
@@ -21,8 +21,8 @@ const createPostActiveIcon = Icon(Icons.add_box_outlined, weight: 100);
 
 /// The type of home tabs.
 enum HomeTabsEnum with NavBarTab {
-  /// The main page.
-  main(order: 0),
+  /// The feed page.
+  feed(order: 0),
 
   createPost(order: 1),
 
@@ -37,7 +37,7 @@ enum HomeTabsEnum with NavBarTab {
   /// Creates a new instance of [HomeTabsEnum] from a given string.
   static HomeTabsEnum fromValue(String? value, {HomeTabsEnum? fallback}) =>
       switch (value?.trim().toLowerCase()) {
-        'main' => main,
+        'feed' => feed,
         'profile' => profile,
         'createPost' => createPost,
         _ => fallback ?? (throw ArgumentError.value(value)),
@@ -51,14 +51,14 @@ enum HomeTabsEnum with NavBarTab {
 
   @override
   Widget get icon => switch (this) {
-    main => mainInactiveIcon,
+    feed => feedInactiveIcon,
     createPost => createPostInactiveIcon,
     profile => profileInactiveIcon,
   };
 
   @override
   Widget get activeIcon => switch (this) {
-    main => mainActiveIcon,
+    feed => feedActiveIcon,
     createPost => createPostActiveIcon,
     profile => profileActiveIcon,
   };

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insta_assets_picker/insta_assets_picker.dart';
@@ -44,10 +46,29 @@ class PostProgressList extends StatelessWidget {
                           borderRadius: const BorderRadius.all(
                             Radius.circular(4),
                           ),
-                          child: Image(
-                            image: AssetEntityImageProvider(progress.asset),
-                            fit: BoxFit.cover,
-                          ),
+                          child: switch (progress.file) {
+                            final File value => Image(
+                              image: FileImage(value),
+                              fit: BoxFit.cover,
+                            ),
+                            _ =>
+                              progress.asset != null
+                                  ? Image(
+                                      image: AssetEntityImageProvider(
+                                        progress.asset!,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(
+                                      color:
+                                          colorScheme.surfaceContainerHighest,
+                                      child: Icon(
+                                        Icons.upload_file,
+                                        color: colorScheme.onSurfaceVariant,
+                                        size: 20,
+                                      ),
+                                    ),
+                          },
                         ),
                       ),
                       Expanded(

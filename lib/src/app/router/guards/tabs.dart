@@ -24,7 +24,7 @@ class HomeAppTab with AppTab {
   static const _root = Routes.home;
 
   static OctopusRoute tabRoute(HomeTabsEnum tab) => switch (tab) {
-    HomeTabsEnum.main => Routes.main,
+    HomeTabsEnum.feed => Routes.feed,
     HomeTabsEnum.profile => Routes.profile,
     HomeTabsEnum.createPost => Routes.createPost,
   };

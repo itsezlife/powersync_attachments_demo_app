@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_classes_with_only_static_members
+
 import 'dart:async';
 import 'dart:developer';
 
@@ -70,6 +72,8 @@ Future<void> bootstrap(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
 
+      ImageCacheConfig.initialize();
+
       try {
         Config.appDocsPath = (await getApplicationDocumentsDirectory()).path;
       } on Object catch (error, stackTrace) {
@@ -128,4 +132,19 @@ Future<void> bootstrap(
       );
     },
   );
+}
+
+/// Configures Flutter's image cache for optimal performance
+/// similar to Telegram's aggressive caching strategy
+class ImageCacheConfig {
+  /// Initialize image cache with Telegram-like settings
+  static void initialize() {
+    // Increase cache size significantly (Telegram uses aggressive caching)
+    // Default is 100MB and 1000 images, we increase to 500MB and 5000 images
+    PaintingBinding.instance.imageCache
+      // Maximum number of cached images (default: 1000)
+      ..maximumSize = 5000
+      // Maximum cache size in bytes (default: ~100MB, we set to 500MB)
+      ..maximumSizeBytes = 5000 * 1024 * 1024; // 1000 MB
+  }
 }

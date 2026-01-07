@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:powersync/powersync.dart';
 import 'package:powersync/sqlite_async.dart';
 import 'package:powersync_client/powersync_client.dart' hide MultipartFile;
-import 'package:powersync_client/src/attachments/uploaded_attachments_storage.dart';
+import 'package:powersync_client/src/attachments/post/uploaded_attachments_storage.dart';
 import 'package:powersync_core/attachments/attachments.dart';
 import 'package:shared/shared.dart' as shared;
 
@@ -74,12 +74,12 @@ final class DeleteFileFailure extends SupabaseStorageAdapterException {
 /// The bucket name for the attachments.
 const attachmentsBucket = 'post_attachments';
 
-/// {@template SupabaseStorageAdapter}
+/// {@template supabase_post_storage_adapter}
 /// A Supabase implementation of the [RemoteStorage] interface.
 /// {@endtemplate}
-class SupabaseStorageAdapter implements RemoteStorage {
-  /// {@macro SupabaseStorageAdapter}
-  SupabaseStorageAdapter({
+class SupabasePostStorageAdapter implements RemoteStorage {
+  /// {@macro supabase_post_storage_adapter}
+  SupabasePostStorageAdapter({
     required PowerSyncDatabase db,
     required UploadedAttachmentsStorage uploadedAttachmentsStorage,
   }) : _db = db,
@@ -594,7 +594,7 @@ class SupabaseStorageAdapter implements RemoteStorage {
     try {
       final existingRemoteAttachmentsWithSameName = await _db.getOptional(
         '''
-          SELECT COUNT(*) as count FROM attachments
+          SELECT COUNT(*) as count FROM post_attachments
           WHERE image_url = ?
           ''',
         [storageFileName],

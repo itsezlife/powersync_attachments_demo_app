@@ -7,7 +7,6 @@ import 'package:powersync_attachments_example/src/app/bloc/app_bloc.dart';
 import 'package:powersync_attachments_example/src/app/router/guards/authentication_guard.dart';
 import 'package:powersync_attachments_example/src/app/router/guards/home_guard.dart';
 import 'package:powersync_attachments_example/src/app/router/guards/tabs_guard.dart';
-import 'package:powersync_attachments_example/src/app/router/route_tracker.dart';
 import 'package:powersync_attachments_example/src/app/router/routes.dart';
 import 'package:user_repository/user_repository.dart';
 
@@ -61,31 +60,6 @@ mixin RouterStateMixin<T extends StatefulWidget> on State<T> {
     );
 
     super.initState();
-  }
-
-  void setupRouteTracking(Octopus router) {
-    try {
-      // Track initial route
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final state = router.state;
-        RouteTracker.instance.updateRoute(state);
-      });
-
-      // Listen to route changes
-      router.observer.addListener(() {
-        final state = router.state;
-        RouteTracker.instance.updateRoute(state);
-      });
-    } catch (error, stackTrace) {
-      FlutterError.reportError(
-        FlutterErrorDetails(
-          exception: error,
-          stack: stackTrace,
-          library: 'RouterStateMixin',
-          context: ErrorDescription('Error setting up route tracking'),
-        ),
-      );
-    }
   }
 }
 

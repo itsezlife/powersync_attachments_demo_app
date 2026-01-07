@@ -94,6 +94,8 @@ DO $$
 BEGIN
     DROP POLICY IF EXISTS "Anyone can view post attachments" ON storage.objects;
     DROP POLICY IF EXISTS "Authenticated users can upload post attachments" ON storage.objects;
+    DROP POLICY IF EXISTS "Authenticated users can update post attachments" ON storage.objects;
+    DROP POLICY IF EXISTS "Authenticated users can delete post attachments" ON storage.objects;
     DROP POLICY IF EXISTS "Users can update their own post attachments" ON storage.objects;
     DROP POLICY IF EXISTS "Users can delete their own post attachments" ON storage.objects;
     
@@ -108,6 +110,7 @@ $$;
 
 -- -----------------------------------------------------
 -- Post Attachments Bucket Policies
+-- Permissive policies allowing all authenticated users full access
 -- -----------------------------------------------------
 
 -- Anyone can view post attachments (public bucket)
@@ -115,31 +118,25 @@ CREATE POLICY "Anyone can view post attachments"
     ON storage.objects FOR SELECT
     USING (bucket_id = 'post_attachments');
 
--- Authenticated users can upload post attachments
-CREATE POLICY "Authenticated users can upload post attachments"
+-- Users can upload any post attachments
+CREATE POLICY "Users can upload post attachments"
     ON storage.objects FOR INSERT
     WITH CHECK (
         bucket_id = 'post_attachments'
-        AND auth.role() = 'authenticated'
     );
 
--- Users can update their own post attachments
--- File path format: {post_id}/{filename}
-CREATE POLICY "Users can update their own post attachments"
+-- Users can update any post attachments
+CREATE POLICY "Users can update post attachments"
     ON storage.objects FOR UPDATE
     USING (
         bucket_id = 'post_attachments'
-        AND auth.role() = 'authenticated'
-        AND is_post_owner((string_to_array(name, '/'))[1]::uuid)
     );
 
--- Users can delete their own post attachments
-CREATE POLICY "Users can delete their own post attachments"
+-- Users can delete any post attachments
+CREATE POLICY "Users can delete post attachments"
     ON storage.objects FOR DELETE
     USING (
         bucket_id = 'post_attachments'
-        AND auth.role() = 'authenticated'
-        AND is_post_owner((string_to_array(name, '/'))[1]::uuid)
     );
 
 -- -----------------------------------------------------

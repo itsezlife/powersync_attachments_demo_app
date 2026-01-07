@@ -1,18 +1,17 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:powersync_attachments_example/src/feed/bloc/feed_bloc.dart';
 import 'package:powersync_attachments_example/src/posts/widgets/posts_list_view.dart';
 import 'package:powersync_attachments_example/src/user_profile/bloc/user_profile_bloc.dart';
 import 'package:shared/shared.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-class UserPostsListView extends StatelessWidget {
-  const UserPostsListView({super.key});
+class FeedPostsListView extends StatelessWidget {
+  const FeedPostsListView({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocBuilder<UserProfileBloc, UserProfileState>(
+  Widget build(BuildContext context) => BlocBuilder<FeedBloc, FeedState>(
     buildWhen: (previous, current) {
       final hasDifference = !const ListEquality<Post>().equals(
         previous.postsPage.items,

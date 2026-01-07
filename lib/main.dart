@@ -30,6 +30,7 @@ void main() =>
       return App(
         postsRepository: postsRepository,
         userRepository: userRepository,
+        powerSyncClient: powerSyncClient,
         user: await userRepository.user.first,
       );
     });

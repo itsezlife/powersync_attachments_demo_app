@@ -108,6 +108,7 @@ class _CreatePostViewState extends State<CreatePostView>
       context.read<UserProfileBloc>().add(
         const UserProfilePostCreateStartRequested(),
       );
+
       goHome.call();
     } catch (error, stackTrace) {
       if (mounted) {

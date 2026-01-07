@@ -9,15 +9,12 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
 import 'package:powersync_client/powersync_client.dart';
-import 'package:powersync_client/src/attachments/uploaded_attachments_storage.dart';
+import 'package:powersync_client/src/attachments/post/uploaded_attachments_storage.dart';
 import 'package:powersync_client/src/schema/schema.dart';
 import 'package:powersync_core/attachments/attachments.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared/shared.dart' as shared;
 import 'package:storage/storage.dart';
-
-/// Global attachments queue instance.
-late AttachmentQueue $attachmentQueue;
 
 /// Env value signature that can be used to get an environment value, base
 /// on provided [Env].
@@ -432,29 +429,29 @@ class PowerSyncClient {
       log('PowerSync status: $status', name: 'PowerSyncClient');
     });
 
+    // If you want to clear local queue and local storage, uncomment:
     // await _db.execute('DELETE FROM attachments_queue');
-    // await _db.execute('DELETE FROM attachments_local');
-    // await _db.execute('DELETE FROM messages_local');
+    // await _db.execute('DELETE FROM post_attachments_local');
+    // await _db.execute('DELETE FROM posts_local');
 
     try {
       final uploadedAttachmentsStorage = UploadedAttachmentsStorage(
         storage: listStorage,
       );
 
-      final remoteStorage = SupabaseStorageAdapter(
+      final remoteStorage = SupabasePostStorageAdapter(
         db: _db,
         uploadedAttachmentsStorage: uploadedAttachmentsStorage,
       );
 
       _remoteStorage = remoteStorage;
 
-      final attachmentQueue = await initializeAttachmentQueue(
+      final attachmentQueue = await initializePostAttachmentQueue(
         _db,
         remoteStorage,
       );
 
       _attachmentQueue = attachmentQueue;
-      $attachmentQueue = attachmentQueue;
 
       await attachmentQueue.startSync();
     } catch (error, stackTrace) {

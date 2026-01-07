@@ -110,7 +110,7 @@ abstract class AppLocalizations {
   /// The label for the bottom navigation bar tab.
   ///
   /// In en, this message translates to:
-  /// **'{tab, select, main{Home} createPost{Create Post} profile{Profile} other{Other}}'**
+  /// **'{tab, select, feed{Feed} createPost{Create Post} profile{Profile} other{Other}}'**
   String bottomNavBarTabLabel(String tab);
 
   /// No description provided for @genericErrorTitle.

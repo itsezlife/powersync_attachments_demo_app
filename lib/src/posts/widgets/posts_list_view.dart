@@ -151,7 +151,7 @@ class PostsListLoading extends StatelessWidget {
   const PostsListLoading({super.key});
 
   static final fakePosts = List.generate(
-    10,
+    5,
     (index) => Post(
       id: 'fake_${Config.randomId(size: 23)}',
       author: PostAuthor(
@@ -161,6 +161,13 @@ class PostsListLoading extends StatelessWidget {
       content: Config.randomId(size: 19),
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      attachments: [
+        Attachment(
+          id: Config.randomId(size: 23),
+          type: AttachmentType.image,
+          imageUrl: 'https://via.placeholder.com/150',
+        ),
+      ],
     ),
   );
 

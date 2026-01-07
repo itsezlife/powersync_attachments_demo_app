@@ -1,20 +1,31 @@
-import 'dart:async';
+// ignore_for_file: lines_longer_than_80_chars
 
-import 'package:bloc/bloc.dart';
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:bloc/bloc.dart' hide Change;
+import 'package:diffutil_dart/diffutil.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 import 'package:posts_repository/posts_repository.dart';
-import 'package:shared/shared.dart';
+import 'package:powersync_attachments_example/src/user_profile/bloc/posts_operations_mixin.dart';
+import 'package:powersync_client/powersync_client.dart';
+import 'package:powersync_database_client/powersync_database_client.dart';
+import 'package:shared/shared.dart' as shared show Attachment;
+import 'package:shared/shared.dart' hide Attachment;
 import 'package:user_repository/user_repository.dart';
 
 part 'user_profile_event.dart';
 part 'user_profile_state.dart';
 
-class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
+class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState>
+    with PostsDatabaseMixin {
   UserProfileBloc({
+    required PowerSyncClient powerSyncClient,
     required UserRepository userRepository,
     required PostsRepository postsRepository,
   }) : _userRepository = userRepository,
+       _powerSyncClient = powerSyncClient,
        _postsRepository = postsRepository,
        super(const UserProfileState.initial()) {
     on<UserProfileChanged>(_onUserProfileChanged);
@@ -24,17 +35,20 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     on<UserProfilePostCreateRequested>(_onPostCreateRequested);
     on<UserProfilePostCreateStartRequested>(_onPostCreateStartRequested);
     on<UserProfilePostDeleteRequested>(_onPostDeleteRequested);
-    on<UserProfilePostsChanged>(_onPostsChanged);
+    on<UserProfilePostsUpdateRequested>(_onPostsUpdateRequested);
 
     add(const UserProfileSubscriptionRequested());
   }
 
   final UserRepository _userRepository;
   final PostsRepository _postsRepository;
+  final PowerSyncClient _powerSyncClient;
 
   static const _postsPageSize = 10;
-  int _shift = 0;
-  Post? _newPost;
+
+  StreamSubscription<List<Post>>? _postsSubscription;
+  StreamSubscription<List<Post>>? _localPostsSubscription;
+  bool _shouldProcessWatchedPosts = false;
 
   Future<void> _onUserProfileSubscriptionRequested(
     UserProfileSubscriptionRequested event,
@@ -113,7 +127,6 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
       }
 
       if (fetchNewPage) {
-        _shift = 0;
         emit(
           state.copyWith(
             postsPage: state.postsPage.copyWith(
@@ -125,11 +138,10 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
       }
 
       final currentPage = event.page ?? state.postsPage.currentPage;
-      final shift = !fetchNewPage ? _shift : 0;
 
       final posts = await _postsRepository.fetchPosts(
         limit: _postsPageSize,
-        offset: (_postsPageSize * currentPage) + shift,
+        offset: _postsPageSize * currentPage,
         userId: state.user.id,
       );
 
@@ -150,6 +162,9 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
           ),
         ),
       );
+
+      _subscribeToRemoteChanges();
+      _subscribeToLocalChanges();
     } on Object catch (error, stackTrace) {
       addError(error, stackTrace);
       emit(
@@ -170,8 +185,6 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   ) async {
     try {
       emit(state.copyWith(postsPage: state.postsPage.loading()));
-
-      _shift = 0;
 
       const currentPage = 0;
 
@@ -195,54 +208,13 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
           ),
         ),
       );
+
+      _subscribeToRemoteChanges();
+      _subscribeToLocalChanges();
     } on Object catch (error, stackTrace) {
       addError(error, stackTrace);
       emit(state.copyWith(postsPage: state.postsPage.failure()));
     }
-  }
-
-  Future<List<Post>> _onPostsChanges({
-    required ({Map<String, dynamic> newRecord, Map<String, dynamic> oldRecord})
-    payload,
-    Post? newPost,
-  }) async {
-    final posts = [...state.postsPage.items];
-    final data = Map<String, dynamic>.from(payload.newRecord);
-    final oldRecord = Map<String, dynamic>.from(payload.oldRecord);
-
-    if (newPost != null) {
-      posts.insert(0, newPost);
-      _shift++;
-      return posts;
-    }
-    if (oldRecord.length == 1 && oldRecord.containsKey('id')) {
-      final index = posts.indexWhere((post) => post.id == oldRecord['id']);
-      if (index == -1) return posts;
-      posts.removeAt(index);
-      _shift--;
-      return posts;
-    }
-    if (_newPost != null) {
-      posts.insert(0, _newPost!);
-      _newPost = null;
-      _shift++;
-    } else {
-      final json = Map<String, dynamic>.from(data);
-      final post = Post.fromJson(json);
-      posts.insert(0, post);
-      _shift++;
-    }
-    return posts;
-  }
-
-  Future<void> _onPostsChanged(
-    UserProfilePostsChanged event,
-    Emitter<UserProfileState> emit,
-  ) async {
-    final payload = event.payload;
-    final newPost = event.newPost;
-    final posts = await _onPostsChanges(payload: payload, newPost: newPost);
-    emit(state.copyWith(postsPage: state.postsPage.copyWith(items: posts)));
   }
 
   Future<void> _onPostCreateRequested(
@@ -251,35 +223,12 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   ) async {
     try {
       emit(state.copyWith(status: UserProfileStatus.postCreating));
-      final createdAt = DateTime.now().toUtc().toIso8601String();
-      final currentUser = await _userRepository.user.first;
-      final post = Post(
-        id: event.postId,
-        content: event.content ?? '',
-        attachments: event.attachments,
-        createdAt: DateTime.parse(createdAt),
-        author: PostAuthor.fromJson(
-          currentUser.toJson()..putIfAbsent('is_owner', () => true),
-        ),
-        updatedAt: DateTime.parse(createdAt),
-      );
-      _newPost = post;
       await _postsRepository.createPost(
-        id: post.id,
+        id: event.postId,
         content: event.content,
         attachments: event.attachments,
       );
-      add(
-        UserProfilePostsChanged((newRecord: {}, oldRecord: {}), newPost: post),
-      );
-      emit(
-        state.copyWith(
-          postsPage: state.postsPage.copyWith(
-            totalLength: state.postsPage.totalLength + 1,
-          ),
-          status: UserProfileStatus.postCreated,
-        ),
-      );
+      emit(state.copyWith(status: UserProfileStatus.postCreated));
     } on Object catch (error, stackTrace) {
       addError(error, stackTrace);
       emit(state.copyWith(status: UserProfileStatus.postCreateFailed));
@@ -299,22 +248,207 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   ) async {
     try {
       await _postsRepository.deletePost(postId: event.postId);
-      add(
-        UserProfilePostsChanged((
-          newRecord: {},
-          oldRecord: {'id': event.postId},
-        )),
+    } on Object catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: UserProfileStatus.postDeleteFailed));
+    }
+  }
+
+  void _subscribeToRemoteChanges() {
+    _shouldProcessWatchedPosts = false;
+    _postsSubscription?.cancel();
+
+    final oldestTimestamp = state.postsPage.posts.isNotEmpty
+        ? state.postsPage.posts.last.createdAt.toIso8601String()
+        : null;
+
+    final whereClause = oldestTimestamp != null
+        ? 'AND datetime(p.created_at) >= datetime(?2)'
+        : '';
+    final query = _powerSyncClient.db().watch(
+      postsQuery(local: false, andWhereClause: whereClause),
+      parameters: [state.user.id, ?oldestTimestamp],
+    );
+
+    _postsSubscription = query
+        .asyncMap(
+          (results) => PostsDatabaseUtils.parsePosts(
+            results,
+            local: false,
+            getAttachmentImageUrl: (postId, attachmentName) => _postsRepository
+                .getPostImageUrl(imageName: attachmentName, postId: postId),
+          ),
+        )
+        .listen((results) {
+          if (!_shouldProcessWatchedPosts) {
+            _shouldProcessWatchedPosts = true;
+            return;
+          }
+          add(UserProfilePostsUpdateRequested(results));
+        });
+  }
+
+  void _subscribeToLocalChanges() {
+    _localPostsSubscription?.cancel();
+    final query = _powerSyncClient.db().watch(
+      postsQuery(local: true),
+      parameters: [state.user.id],
+      triggerOnTables: ['post_attachments_local'],
+    );
+
+    _localPostsSubscription = query
+        .asyncMap(
+          (results) => PostsDatabaseUtils.parsePosts(
+            results,
+            local: true,
+            // Local posts don't have remote attachments, so we don't transform urls
+            // getAttachmentImageUrl: ...
+          ),
+        )
+        .listen((results) {
+          if (results.isEmpty) return;
+          add(
+            UserProfilePostsUpdateRequested(
+              results,
+              excludedDiffs: const [DiffUpdateType.remove],
+            ),
+          );
+        });
+  }
+
+  Future<void> _onPostsUpdateRequested(
+    UserProfilePostsUpdateRequested event,
+    Emitter<UserProfileState> emit,
+  ) async {
+    try {
+      final newList = List<Post>.from(event.posts);
+
+      // Add local only messages that are not yet in the new list
+      for (final localPost in state.postsPage.posts.where((p) => p.localOnly)) {
+        if (!newList.any((p) => p.id == localPost.id)) {
+          newList.add(localPost);
+        }
+      }
+
+      newList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      final oldList = state.postsPage.posts;
+
+      log(
+        'oldList(${oldList.length}): $oldList',
+        name: '_onPostsUpdateRequested',
       );
+      log(
+        'newList(${newList.length}): $newList',
+        name: '_onPostsUpdateRequested',
+      );
+
+      final diffResult = await compute(calculatePostsChangesDiff, [
+        oldList,
+        newList,
+        event.excludedDiffs,
+      ]);
+
+      // Create a new list by applying the updates from the diff result
+      final updatedList = List<Post>.from(oldList);
+      final updates = diffResult;
+      log('updates: $updates', name: '_onPostsUpdateRequested');
+
+      // Track position offset for adjusting subsequent operations
+      var positionOffset = 0;
+
+      for (final update in updates) {
+        update.when(
+          insert: (pos, count) {
+            final adjustedPos = pos + positionOffset;
+            final data = newList.sublist(pos, pos + count);
+            updatedList.insertAll(adjustedPos, data);
+
+            for (var i = 0; i < count; i++) {
+              final message = data[i];
+              postsChangesController.add(
+                DataInsert(position: pos + i, data: message),
+              );
+            }
+
+            // Insertions shift subsequent positions forward
+            positionOffset += count;
+          },
+          remove: (pos, count) {
+            final adjustedPos = pos + positionOffset;
+
+            // Validate the range before attempting removal
+            if (adjustedPos >= updatedList.length) {
+              log(
+                'Invalid remove position: adjustedPos=$adjustedPos, '
+                'updatedList.length=${updatedList.length}, '
+                'originalPos=$pos, offset=$positionOffset',
+                name: '_onPostsUpdateRequested',
+              );
+              return;
+            }
+
+            final actualCount = (adjustedPos + count > updatedList.length)
+                ? updatedList.length - adjustedPos
+                : count;
+
+            updatedList.removeRange(adjustedPos, adjustedPos + actualCount);
+
+            for (var i = 0; i < actualCount; i++) {
+              if (pos + i < oldList.length) {
+                final message = oldList[pos + i];
+                postsChangesController.add(
+                  DataRemove(position: pos + i, data: message),
+                );
+              }
+            }
+
+            // Removals shift subsequent positions backward
+            positionOffset -= actualCount;
+          },
+          change: (pos, payload) {
+            final adjustedPos = pos + positionOffset;
+
+            if (pos >= newList.length || adjustedPos >= updatedList.length) {
+              log(
+                'Invalid position: pos=$pos, adjustedPos=$adjustedPos, '
+                'newList.length=${newList.length}, '
+                'updatedList.length=${updatedList.length}, '
+                'oldList.length=${oldList.length}',
+                name: '_onPostsUpdateRequested',
+              );
+              return;
+            }
+
+            final newMessage = newList[pos];
+            final existingMessage = oldList[pos];
+
+            postsChangesController.add(
+              DataChange(
+                position: pos,
+                oldData: existingMessage,
+                newData: newMessage,
+              ),
+            );
+            // This is for partial updates, for simplicity we replace the item
+            updatedList[adjustedPos] = newList[pos];
+          },
+          move: (from, to) {
+            // not used since detectMoves is false
+          },
+        );
+      }
+
       emit(
         state.copyWith(
           postsPage: state.postsPage.copyWith(
-            totalLength: state.postsPage.totalLength - 1,
+            items: updatedList,
+            totalLength: updatedList.length,
           ),
         ),
       );
     } on Object catch (error, stackTrace) {
       addError(error, stackTrace);
-      emit(state.copyWith(status: UserProfileStatus.postDeleteFailed));
     }
   }
 }
