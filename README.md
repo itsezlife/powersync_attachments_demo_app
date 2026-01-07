@@ -38,7 +38,7 @@ A Flutter demo application showcasing PowerSync Attachments Helper API usage wit
    flutter pub get
    ```
 
-3. Configure your environment variables in `config/development.json`
+3. Configure your environment variables in `packages/env/` and run ./scripts/build_runner.sh env
 
 4. Run Supabase migrations:
 
