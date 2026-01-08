@@ -126,6 +126,7 @@ class PostsController {
         type: AttachmentType.image,
         mimeType: attachmentFile.mediaType?.mimeType,
         file: attachmentFile,
+        imageUrl: attachmentFile.name,
         fileSize: attachmentFile.size,
       );
       attachments.add(attachment);

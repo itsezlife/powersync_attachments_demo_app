@@ -77,9 +77,9 @@ class PostsRepository {
     }
     try {
       return _databaseClient.getPublicUrl(
-        name: postId,
+        name: imageName,
         storageBucket: 'post_attachments',
-        path: (name) => '$name/$imageName',
+        path: (name) => '$postId/$name',
         transform: transform,
       );
     } on GetPublicUrlFailure {

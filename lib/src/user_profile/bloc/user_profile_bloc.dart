@@ -223,6 +223,7 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState>
   ) async {
     try {
       emit(state.copyWith(status: UserProfileStatus.postCreating));
+
       await _postsRepository.createPost(
         id: event.postId,
         content: event.content,

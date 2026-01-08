@@ -65,13 +65,10 @@ class PostAttachment extends StatelessWidget {
         CachedNetworkImageWithMinithumbnail(
           height: height,
           width: width,
-          // Just for simplicity, we use the same height as for the image
-          cacheWidth: height.toInt(),
+          // Just for simplicity, we use the same width as for the image
+          cacheWidth: width.toInt(),
           cacheHeight: null,
-          url: switch (imageUrl) {
-            final String value => value,
-            _ => '',
-          },
+          url: imageUrl ?? '',
           file: File(switch (attachment.file?.path) {
             final String value when imageUrl == null => value,
             _ => Config.appDocsPath.resolveFilePath(imageUrl!.split('/').last),

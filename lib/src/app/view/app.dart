@@ -40,6 +40,7 @@ class App extends StatelessWidget {
           create: (_) => AppBloc(user: user, userRepository: userRepository),
         ),
         BlocProvider(
+          lazy: false,
           create: (_) => UserProfileBloc(
             powerSyncClient: powerSyncClient,
             userRepository: userRepository,
