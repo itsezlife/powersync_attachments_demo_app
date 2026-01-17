@@ -46,6 +46,7 @@ mixin HomeTabsMixin<T extends StatefulWidget> on State<T> {
       onBackButtonPressed: onBackButtonPressed,
       tabBuilder: tabBuilder,
       onTabChanged: onTabChanged,
+      tabIdentifier: tab.identifier,
       builder: (context, child, currentIndex, innerOnTabPressed) => _Body(
         currentIndex: currentIndex,
         tabs: tab.bottomTabs,

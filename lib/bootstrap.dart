@@ -75,13 +75,23 @@ Future<void> bootstrap(
       ImageCacheConfig.initialize();
 
       try {
-        Config.appDocsPath = (await getApplicationDocumentsDirectory()).path;
-      } on Object catch (error, stackTrace) {
-        log(
-          'Error getting application documents directory.',
-          name: 'bootstrap',
-          error: error,
-          stackTrace: stackTrace,
+        final String appDocsPath;
+        if (Config.isCupertino) {
+          appDocsPath = (await getApplicationSupportDirectory()).path;
+        } else {
+          appDocsPath = (await getApplicationDocumentsDirectory()).path;
+        }
+        Config.appDocsPath = appDocsPath;
+      } catch (error, stackTrace) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'bootstrap',
+            context: ErrorDescription(
+              'Error getting application documents directory.',
+            ),
+          ),
         );
       }
 
